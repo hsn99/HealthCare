@@ -1,22 +1,17 @@
 import paho.mqtt.client as mqtt
-from app.database import save_weight
-import json
+from app.database import store_weight
 
-MQTT_BROKER = "localhost"
+MQTT_BROKER = "localhost"  # Broker IP
 MQTT_TOPIC = "WightSensor"
 
 def on_connect(client, userdata, flags, rc):
-    print(f"Connected to MQTT broker with code {rc}")
+    print("Connected with result code " + str(rc))
     client.subscribe(MQTT_TOPIC)
 
 def on_message(client, userdata, msg):
-    try:
-        payload = json.loads(msg.payload.decode())
-        weight = payload.get("weight")
-        if weight:
-            save_weight(weight)
-    except Exception as e:
-        print(f"MQTT Error: {e}")
+    weight = msg.payload.decode()
+    print(f"Received weight: {weight}")
+    store_weight(weight)
 
 def start_mqtt():
     client = mqtt.Client()

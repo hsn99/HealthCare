@@ -1,11 +1,22 @@
+import threading
 from fastapi import FastAPI
-from app import database, models, gemini_client
 from fastapi.middleware.cors import CORSMiddleware
+from .db.database import engine, Base
+from app.routes import (
+    patient_routes,
+    doctor_route,
+    questionnaire_route,
+    room_route,
+    login_route,
+)
+from .crud.auth_crud import fingerprint_loop
 
-# Initialize FastAPI app
+# Create the DB tables
+Base.metadata.create_all(bind=engine)
+
 app = FastAPI()
 
-# Allow frontend access
+# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -13,42 +24,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Root path
-@app.get("/")
-def root():
-    return {"message": "Healthcare robot is running!"}
+# Create database tables
+Base.metadata.create_all(bind=engine)
 
-# Route to get all patients
-@app.get("/patients/")
-async def get_patients():
-    patients = database.get_all_patients()
-    result = []
-    for p in patients:
-        result.append({
-            "id": p[0],
-            "patient_id": p[1],
-            "temperature": p[2],
-            "weight": p[3],
-            "blood_pressure": p[4],
-            "pulse": p[5],
-            "created_at": p[6],
-        })
-    return result
+# Check DB connection and print DB path
+try:
+    with engine.connect() as conn:
+        print("✅ Connected to the database successfully.")
+        print(f"📁 Database path: {engine.url.database}")
+except Exception as e:
+    print("❌ Failed to connect to the database:", e)
 
-# Route to submit patient readings
-@app.post("/submit-readings/")
-def submit_readings(reading: models.PatientReadings):
-    database.save_patient(reading)
-    return {"message": "Patient readings saved successfully"}
 
-# Route to get latest weight from weight sensor
-@app.get("/weight/")
-async def read_latest_weight():
-    weight = database.get_latest_weight()
-    return {"latest_weight": weight}
+app.include_router(patient_routes.router)
+app.include_router(doctor_route.router)
+app.include_router(questionnaire_route.router)
+app.include_router(room_route.router)
+app.include_router(login_route.router)
 
-# Diagnose patient (send to Gemini)
-@app.post("/diagnose/")
-async def diagnose(data: models.PatientReadings):
-    response = gemini_client.send_to_gemini(data)
-    return response
+
+scanner_thread = threading.Thread(target=fingerprint_loop, daemon=True)
+scanner_thread.start()
