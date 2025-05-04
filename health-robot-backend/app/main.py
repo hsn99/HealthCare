@@ -43,5 +43,5 @@ app.include_router(room_route.router)
 app.include_router(login_route.router)
 
 
-scanner_thread = threading.Thread(target=fingerprint_loop, daemon=True)
-scanner_thread.start()
+# scanner_thread = threading.Thread(target=fingerprint_loop, daemon=True)
+# scanner_thread.start()

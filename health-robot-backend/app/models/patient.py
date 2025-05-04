@@ -14,6 +14,7 @@ class Patient(Base):
     gender = Column(String)
     weight = Column(Float)
     height = Column(Integer)
+    fingerprint_id = Column(Integer)
 
     contact_info = Column(String)
 

@@ -4,6 +4,7 @@ import "./App.css"
 import Home from "./components/HomePage/homepage"
 import Nav from "./components/Nav/Nav"
 import QuestionsForm from "./components/QuestionsForm/QuestionsForm"
+import PatientForm from "./components/PatientForm/patientForm"
 
 function App() {
   const [user, setUser] = useState(null)
@@ -35,6 +36,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/test" element={<QuestionsForm />} />
+            <Route path="/patient" element={<PatientForm />} />
           </Routes>
         </main>
       </div>

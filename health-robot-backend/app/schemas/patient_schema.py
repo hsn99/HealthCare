@@ -18,6 +18,7 @@ class PatientBase(BaseModel):
 class PatientCreate(PatientBase):
     doctor_id: Optional[int] = None
     room_id: Optional[int] = None
+    fingerprint_id: Optional[int] = None
 
 
 class PatientOut(PatientBase):
@@ -25,6 +26,7 @@ class PatientOut(PatientBase):
     doctor: Optional[DoctorOut]
     room: Optional[RoomOut]
     disease_history: List[DiseaseHistoryOut] = []
+    fingerprint_id: Optional[int] = None
 
     class Config:
         arbitrary_types_allowed = True

@@ -12,8 +12,8 @@ const Home = () => {
     const interval = setInterval(async () => {
       setChecking(true)
       try {
-        const response = await axios.get(
-          "http://localhost:8000/auth/fingerprint/last"
+        const response = await axios.post(
+          "http://localhost:8000/login/fingerprint"
         )
         if (response.data.status === "success") {
           setUser(response.data.user)
