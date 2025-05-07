@@ -1,6 +1,6 @@
-// src/App.js
 import React, { useState } from "react"
 import axios from "axios"
+import "./QuestionsForm.css"
 
 const abcdeQuestions = [
   {
@@ -56,6 +56,8 @@ function QuestionsForm() {
   const [answers, setAnswers] = useState([])
   const [input, setInput] = useState("")
   const [responseData, setResponseData] = useState(null)
+  const [measurementResult, setMeasurementResult] = useState(null)
+  const [bloodPressure, setBloodPressure] = useState(null)
 
   const handleStart = () => {
     setStarted(true)
@@ -63,17 +65,21 @@ function QuestionsForm() {
     setAnswers([])
     setInput("")
     setResponseData(null)
+    setMeasurementResult("")
+    setBloodPressure(null)
   }
 
   const handleNext = () => {
-    const updatedAnswers = [...answers, input]
+    const answerToSave = input || measurementResult || "No data provided"
+    const updatedAnswers = [...answers, answerToSave]
     setAnswers(updatedAnswers)
     setInput("")
+    setMeasurementResult("")
+    setBloodPressure("")
 
     if (currentQuestion < abcdeQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1)
     } else {
-      // Submit to server
       axios
         .post("http://localhost:8000/questionnaire", {
           answers: updatedAnswers,
@@ -89,13 +95,21 @@ function QuestionsForm() {
     }
   }
 
-  const handleMeasurement = (section) => {
-    if (section === "Circulation") {
-      const result = "BP: 120/80, Pulse: 72bpm"
-      setInput(result)
-    } else if (section === "Exposure") {
-      const result = "Temperature: 36.7°C"
-      setInput(result)
+  const handleMeasurement = async (section) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/questionnaire/${section}`
+      )
+
+      if (response?.data) {
+        setMeasurementResult(response.data.res)
+        setInput(response.data.res)
+      } else {
+        alert("No data received from the server.")
+      }
+    } catch (error) {
+      alert("Error submitting answers.")
+      console.error("Measurement error:", error)
     }
   }
 
@@ -103,9 +117,9 @@ function QuestionsForm() {
   const question = current.questions[0]
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <div className="form-container">
       {responseData ? (
-        <div>
+        <div className="card response">
           <h2>Test Completed</h2>
           <p>
             <strong>Assigned Doctor:</strong>{" "}
@@ -115,30 +129,54 @@ function QuestionsForm() {
             <strong>Assigned Room:</strong>{" "}
             {responseData.assigned_room || "Not Assigned"}
           </p>
-
-          <br />
-          <button onClick={handleStart}>Restart Test</button>
+          <button className="button" onClick={handleStart}>
+            Restart Test
+          </button>
         </div>
       ) : !started ? (
-        <button onClick={handleStart}>Start Test</button>
+        <div className="card center">
+          <h2>Start Your Health Check</h2>
+          <button className="button" onClick={handleStart}>
+            Start Test
+          </button>
+        </div>
       ) : (
-        <div>
+        <div className="card question-card">
           <h2>{current.section}</h2>
-          <h3>{question.en}</h3>
-          <h3>{question.ar}</h3>
+          <p className="question-en">{question.en}</p>
+          <p className="question-ar">{question.ar}</p>
 
           {current.section === "Circulation" ||
           current.section === "Exposure" ? (
-            <button
-              onClick={() => handleMeasurement(current.section)}
-              style={{ padding: "0.5rem 1rem", marginTop: "1rem" }}
-            >
-              Start {current.section} Test
-            </button>
+            <>
+              {current.section === "Circulation" && (
+                <div className="input-group">
+                  <label htmlFor="blood_pressure" className="input-label">
+                    Blood Pressure
+                  </label>
+                  <input
+                    type="text"
+                    name="blood_pressure"
+                    id="blood_pressure"
+                    className="text-input"
+                    value={bloodPressure}
+                    onChange={(e) => setBloodPressure(e.target.value)}
+                  />
+                </div>
+              )}
+              <button
+                className="button small"
+                onClick={() => handleMeasurement(current.section)}
+              >
+                Start {current.section} Test
+              </button>
+              <p className="test-result-label">
+                {measurementResult || "Result will appear here"}
+              </p>
+            </>
           ) : (
             <select
-              name="answer"
-              id="answer"
+              className="dropdown"
               onChange={(e) => setInput(e.target.value)}
               value={input}
             >
@@ -150,9 +188,11 @@ function QuestionsForm() {
             </select>
           )}
 
-          <br />
-          <br />
-          <button onClick={handleNext} disabled={!input}>
+          <button
+            className="button next"
+            onClick={handleNext}
+            disabled={!input}
+          >
             {currentQuestion === abcdeQuestions.length - 1 ? "Submit" : "Next"}
           </button>
         </div>

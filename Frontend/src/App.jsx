@@ -12,17 +12,14 @@ function App() {
   const handleLogOut = () => {
     setUser(null)
     localStorage.clear()
-  }
-
-  const checkToken = async () => {
-    const user = await CheckSession()
-    setUser(user)
+    window.location.href = "/"
   }
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (token) {
-      checkToken()
+    const userId = localStorage.getItem("user_id")
+    const userName = localStorage.getItem("user_name")
+    if (userId && userName) {
+      setUser({ id: userId, name: userName })
     }
   }, [])
 
@@ -34,7 +31,7 @@ function App() {
         </header>
         <main>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Home setUser={setUser} />} />
             <Route path="/test" element={<QuestionsForm />} />
             <Route path="/patient" element={<PatientForm />} />
           </Routes>

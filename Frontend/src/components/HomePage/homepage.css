@@ -1,0 +1,89 @@
+/* Root container */
+.homepage-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to right, #f3f4f6, #e5e7eb);
+  padding: 20px;
+}
+
+/* Logo */
+.logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+/* Card styling */
+.card {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Text styles */
+.title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #1f2937;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+.status-text {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  color: #4b5563;
+}
+
+/* Fingerprint animation */
+.fingerprint {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  background-image: url('./assets/fingerprint.png'); /* Add your fingerprint image here */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.5;
+  transition: transform 0.3s ease-in-out;
+}
+
+.fingerprint.scanning {
+  animation: pulse 1.2s infinite;
+  opacity: 1;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+}
+
+/* Footer */
+.footer {
+  margin-top: 30px;
+  font-size: 0.85rem;
+  color: #9ca3af;
+  text-align: center;
+}

@@ -1,0 +1,110 @@
+.form-container {
+  max-width: 600px;
+  margin: 3rem auto;
+  padding: 1rem;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.response {
+  background-color: #f9f9f9;
+}
+
+.question-card {
+  background-color: #fefefe;
+}
+
+.question-en {
+  font-size: 1.2rem;
+  margin: 1rem 0;
+}
+
+.question-ar {
+  font-size: 1.1rem;
+  color: #444;
+  direction: rtl;
+  text-align: right;
+  margin-bottom: 1.5rem;
+}
+
+.button {
+  background-color: #4f46e5;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.button:hover {
+  background-color: #4338ca;
+}
+
+.button.small {
+  font-size: 0.9rem;
+  padding: 8px 16px;
+}
+
+.button.next {
+  margin-top: 2rem;
+}
+
+.dropdown {
+  padding: 10px;
+  width: 100%;
+  max-width: 300px;
+  font-size: 1rem;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  appearance: none;
+  background: #f8f8f8;
+  cursor: pointer;
+}
+
+.input-group {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto 1.5rem;
+  text-align: left;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.text-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fefefe;
+}
+
+.test-result-label {
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-style: italic;
+  color: #333;
+}

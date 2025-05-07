@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import axios from "axios"
+import "./PatientForm.css" // Import the CSS file
 
 const PatientForm = () => {
   const [form, setForm] = useState({
@@ -9,8 +10,6 @@ const PatientForm = () => {
     weight: "",
     height: "",
     contact_info: "",
-    // doctor_id: "",
-    // room_id: "",
   })
 
   const [fingerprintId, setFingerprintId] = useState(null)
@@ -49,41 +48,42 @@ const PatientForm = () => {
       const payload = {
         ...form,
         fingerprint_id: fingerprintId,
-        age: parseInt(form.age),
-        weight: parseFloat(form.weight),
-        height: parseInt(form.height),
-        // doctor_id: parseInt(form.doctor_id),
-        // room_id: parseInt(form.room_id),
+        age: Number(form.age) || 0,
+        weight: parseFloat(form.weight) || 0,
+        height: Number(form.height) || 0,
       }
 
       await axios.post("http://localhost:8000/patients", payload)
+
       setSuccessMessage("✅ Patient added successfully!")
-      setForm({
-        name: "",
-        age: "",
-        gender: "",
-        weight: "",
-        height: "",
-        contact_info: "",
-        // doctor_id: "",
-        // room_id: "",
-      })
-      setFingerprintId(null)
+
+      setTimeout(() => {
+        setForm({
+          name: "",
+          age: "",
+          gender: "",
+          weight: "",
+          height: "",
+          contact_info: "",
+        })
+        setFingerprintId(null)
+      }, 2000)
     } catch (err) {
       console.error(err)
       setSubmitError("❌ Failed to create patient.")
     }
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-8 px-4">
-      <div className="w-full max-w-2xl bg-white shadow-xl rounded-2xl p-8 space-y-6">
-        <h2 className="text-3xl font-bold text-center text-gray-800">
-          🩺 Add New Patient
-        </h2>
+  const isFormValid =
+    form.name && form.age && form.gender && fingerprintId
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  return (
+    <div className="form-container">
+      <div className="form-box">
+        <h2 className="form-title">🩺 Add New Patient</h2>
+
+        <form onSubmit={handleSubmit} className="form-grid">
+          <div className="form-fields">
             <input
               name="name"
               placeholder="Full Name"
@@ -136,78 +136,50 @@ const PatientForm = () => {
               onChange={handleChange}
               className="input-style"
             />
-            {/* <input
-              type="number"
-              name="doctor_id"
-              placeholder="Doctor ID"
-              value={form.doctor_id}
-              onChange={handleChange}
-              className="input-style"
-            />
-            <input
-              type="number"
-              name="room_id"
-              placeholder="Room ID"
-              value={form.room_id}
-              onChange={handleChange}
-              className="input-style"
-            /> */}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="scan-section">
             <button
               type="button"
               onClick={handleScanFingerprint}
-              disabled={isScanning}
-              className={`px-5 py-2 rounded-lg text-white font-semibold ${
-                isScanning
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
+              disabled={
+                isScanning || !(form.name && form.age && form.gender)
+              }
+              className={`scan-btn ${
+                isScanning || !(form.name && form.age && form.gender)
+                  ? "btn-disabled"
+                  : ""
               }`}
             >
               {isScanning ? "Scanning..." : "🔍 Scan Fingerprint"}
             </button>
+
             {fingerprintId && (
-              <span className="text-green-600 font-medium">
+              <span className="success-text">
                 ✅ Scanned: ID {fingerprintId}
               </span>
             )}
             {scanError && (
-              <span className="text-red-600 font-medium">{scanError}</span>
+              <span className="error-text">{scanError}</span>
             )}
           </div>
 
           <button
             type="submit"
-            className={`w-full py-3 text-lg rounded-lg font-bold text-white transition ${
-              fingerprintId
-                ? "bg-green-600 hover:bg-green-700"
-                : "bg-gray-400 cursor-not-allowed"
-            }`}
+            disabled={!isFormValid}
+            className={`submit-btn ${!isFormValid ? "btn-disabled" : ""}`}
           >
             ➕ Submit Patient
           </button>
         </form>
 
-        {/* Feedback Messages */}
         {successMessage && (
-          <div className="text-center text-green-700 font-semibold">
-            {successMessage}
-          </div>
+          <div className="success-text text-center">{successMessage}</div>
         )}
         {submitError && (
-          <div className="text-center text-red-600 font-semibold">
-            {submitError}
-          </div>
+          <div className="error-text text-center">{submitError}</div>
         )}
       </div>
-
-      {/* Tailwind input styling override */}
-      <style>{`
-        .input-style {
-          @apply w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400;
-        }
-      `}</style>
     </div>
   )
 }

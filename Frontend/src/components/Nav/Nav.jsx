@@ -1,29 +1,29 @@
+// Nav.jsx
 import React from "react"
 import { Link } from "react-router-dom"
 import "./Nav.css"
+import logo from "./logo.png"
 
-const Nav = ({ handleLogOut }) => {
-  const userId = localStorage.getItem("userId")
-
+const Nav = ({ user, handleLogOut }) => {
   return (
     <nav className="navbar">
-      <div>
-        <Link to="/" aria-label="Home">
-          Home
+      <div className="navbar-left">
+        <Link to="/" className="logo-link">
+          <img src={logo} alt="ON POWER Logo" className="logo" />
         </Link>
       </div>
-
-      <div>
-        {userId ? (
-          <div>
-            <Link onClick={handleLogOut} to="/" className="navButton">
+      <div className="navbar-right">
+        {user ? (
+          <>
+            <span className="nav-username">Hello, {user.name}</span>
+            <button onClick={handleLogOut} className="navButton">
               Sign Out
-            </Link>
-          </div>
+            </button>
+          </>
         ) : (
-          <div className="nav-section guest-user-links">
-            <Link to="/login" className="navButton">
-              Login
+          <div className="navbar-right">
+            <Link to="/patient" className="navButton">
+              <span>Add new Patient</span>
             </Link>
           </div>
         )}
