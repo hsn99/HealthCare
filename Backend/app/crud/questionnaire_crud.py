@@ -160,6 +160,6 @@ def get_max_thermal_temperature(duration_seconds=5):
 
 
 def exposure_test():
-    # thermal_data = get_max_thermal_temperature()
-    # print(thermal_data)
-    return {"res": "120"}
+    thermal_data = get_max_thermal_temperature()
+    print(thermal_data)
+    return {"res": thermal_data}
