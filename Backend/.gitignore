@@ -1,0 +1,32 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.so
+
+# Environment
+.env
+myenv/
+venv/
+env/
+
+# OS or editor cache
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Node.js stuff (if applicable)
+node_modules/
+
+# Build files
+build/
+dist/
+
+# Logs
+*.log
+
+# Compiled files
+*.o
+*.pyc
+

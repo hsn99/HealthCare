@@ -15,14 +15,12 @@ class PatientBase(BaseModel):
 
 class PatientCreate(PatientBase):
     doctor_id: Optional[int] = None
-    room_id: Optional[int] = None
     fingerprint_id: Optional[int] = None
 
 
 class PatientOut(PatientBase):
     id: int
     doctor: Optional[DoctorOut]
-    room: Optional[int]
     disease_history: List[DiseaseHistoryOut] = []
     fingerprint_id: Optional[int] = None
 

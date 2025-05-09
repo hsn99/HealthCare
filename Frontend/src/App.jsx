@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react"
+import axios from "axios"
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import "./App.css"
 import Home from "./components/HomePage/homepage"
@@ -14,7 +15,16 @@ function App() {
   const handleLogOut = () => {
     setUser(null)
     localStorage.clear()
-    window.location.href = "/"
+
+    axios
+      .post("http://localhost:8000/logout")
+      .then((response) => {
+        console.log("Logout successful:", response.data)
+        window.location.href = "/"
+      })
+      .catch((error) => {
+        console.error("Error during logout:", error)
+      })
   }
 
   useEffect(() => {

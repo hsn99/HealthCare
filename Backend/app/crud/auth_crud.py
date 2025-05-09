@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 import time
 import serial
+from threading import Lock
 import adafruit_fingerprint
 from app.schemas.patient_schema import PatientCreate, PatientOut
 from app.models.patient import Patient
@@ -16,22 +17,31 @@ finger = adafruit_fingerprint.Adafruit_Fingerprint(uart)
 is_logged_in = False
 stop_scanning = False
 
+from threading import Lock
+
+fingerprint_lock = Lock()
+
 
 def get_fingerprint() -> int | None:
-    """Scan for a fingerprint and return True if matched."""
-    print("Waiting for image...")
-    while finger.get_image() != adafruit_fingerprint.OK:
-        pass
+    with fingerprint_lock:
+        try:
+            """Scan for a fingerprint and return True if matched."""
+            print("Waiting for image...")
+            while finger.get_image() != adafruit_fingerprint.OK:
+                pass
 
-    print("Templating...")
-    if finger.image_2_tz(1) != adafruit_fingerprint.OK:
-        return None
+            print("Templating...")
+            if finger.image_2_tz(1) != adafruit_fingerprint.OK:
+                return None
 
-    print("Searching...")
-    if finger.finger_search() != adafruit_fingerprint.OK:
-        return None
+            print("Searching...")
+            if finger.finger_search() != adafruit_fingerprint.OK:
+                return None
 
-    return finger.finger_id
+            return finger.finger_id
+        except Exception as e:
+            print("Fingerprint error:", e)
+            return None
 
 
 def fingerprint_loop(callback):
@@ -71,7 +81,7 @@ def enroll_finger(location: int) -> bool:
                 break
             if i == adafruit_fingerprint.NOFINGER:
                 print(".", end="")
-                time.sleep(0.5)
+                time.sleep(0.1)
             elif i == adafruit_fingerprint.IMAGEFAIL:
                 print("Imaging error")
                 return False
