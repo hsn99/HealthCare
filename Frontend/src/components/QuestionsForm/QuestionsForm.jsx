@@ -56,8 +56,8 @@ function QuestionsForm() {
   const [answers, setAnswers] = useState([])
   const [input, setInput] = useState("")
   const [responseData, setResponseData] = useState(null)
-  const [measurementResult, setMeasurementResult] = useState(null)
-  const [bloodPressure, setBloodPressure] = useState(null)
+  const [measurementResult, setMeasurementResult] = useState("")
+  const [bloodPressure, setBloodPressure] = useState("")
 
   const handleStart = () => {
     setStarted(true)
@@ -66,11 +66,24 @@ function QuestionsForm() {
     setInput("")
     setResponseData(null)
     setMeasurementResult("")
-    setBloodPressure(null)
+    setBloodPressure("")
   }
 
+  const patient_id = localStorage.getItem("user_id")
+
   const handleNext = () => {
-    const answerToSave = input || measurementResult || "No data provided"
+    let answerToSave = "No data provided"
+
+    if (abcdeQuestions[currentQuestion].section === "Circulation") {
+      answerToSave = `${bloodPressure || "No BP"}/${
+        measurementResult || "No Pulse"
+      }`
+    } else if (abcdeQuestions[currentQuestion].section === "Exposure") {
+      answerToSave = measurementResult || "No Temperature"
+    } else {
+      answerToSave = input || "No answer"
+    }
+
     const updatedAnswers = [...answers, answerToSave]
     setAnswers(updatedAnswers)
     setInput("")
@@ -83,6 +96,7 @@ function QuestionsForm() {
       axios
         .post("http://localhost:8000/questionnaire", {
           answers: updatedAnswers,
+          patient_id: patient_id,
         })
         .then((res) => {
           setResponseData(res.data)
@@ -103,12 +117,12 @@ function QuestionsForm() {
 
       if (response?.data) {
         setMeasurementResult(response.data.res)
-        setInput(response.data.res)
+        setInput(response.data.res) // Used to enable the "Next" button
       } else {
         alert("No data received from the server.")
       }
     } catch (error) {
-      alert("Error submitting answers.")
+      alert("Error retrieving measurement data.")
       console.error("Measurement error:", error)
     }
   }
@@ -191,7 +205,13 @@ function QuestionsForm() {
           <button
             className="button next"
             onClick={handleNext}
-            disabled={!input}
+            disabled={
+              current.section === "Circulation"
+                ? !bloodPressure || !measurementResult
+                : current.section === "Exposure"
+                ? !measurementResult
+                : !input
+            }
           >
             {currentQuestion === abcdeQuestions.length - 1 ? "Submit" : "Next"}
           </button>

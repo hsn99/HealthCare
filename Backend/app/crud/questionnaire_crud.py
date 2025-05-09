@@ -8,6 +8,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from typing import Dict
 from app.models.questionnaire import Questionnaire
+from app.models.patient import Patient
 from app.schemas.questionnaire_schema import QuestionnaireCreate
 from ..models import Doctor
 
@@ -80,14 +81,16 @@ def Geamini(message):
 def analyse_questions(db: Session, data: Dict):
     answers = data.get("answers", [])
 
+    patient = db.query(Patient).filter(Patient.id == data["patient_id"]).first()
+
     patient_data = {
-        "id": "1",
-        "age": 20,
+        "id": patient.id,
+        "age": patient.age,
         "temperature": answers[2],  # From MLX90640
-        "weight": 61.5,  # From HX711
+        "weight": patient.weight,  # From HX711
         "spo2": 70,  # From MAX30102
         "heart_rate": 116,  # From MAX30102
-        "blood_pressure": "125/90",  # From manual or sensor
+        "blood_pressure": data["measurement"],  # From manual or sensor
         # ABCDE Questions (answers from touchscreen input)
         "questions": {
             "A_airway_difficulty_breathing_swallowing": answers[0],
@@ -135,7 +138,7 @@ def circulation_test():
 def get_max_thermal_temperature(duration_seconds=5):
     i2c = busio.I2C(board.SCL, board.SDA)
     mlx = adafruit_mlx90640.MLX90640(i2c)
-    mlx.refresh_rate = adafruit_mlx90640.RefreshRate.REFRESH_2_HZ
+    mlx.refresh_rate = adafruit_mlx90640.RefreshRate.REFRESH_1_HZ
 
     frame = np.zeros((24 * 32,))  # Array for 768 temperature readings
     end_time = time.time() + duration_seconds
@@ -162,4 +165,4 @@ def get_max_thermal_temperature(duration_seconds=5):
 def exposure_test():
     thermal_data = get_max_thermal_temperature()
     print(thermal_data)
-    return {"res": thermal_data}
+    return {"res": thermal_data["max_temperature"]}
