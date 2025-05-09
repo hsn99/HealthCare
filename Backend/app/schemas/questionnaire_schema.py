@@ -1,7 +1,6 @@
 from typing import List, Optional
 from pydantic import BaseModel, field_validator
 from .doctor_schema import DoctorOut
-from .room_schema import RoomOut
 import json
 
 
@@ -18,7 +17,7 @@ class QuestionnaireCreate(QuestionnaireBase):
 
 class QuestionnaireOut(QuestionnaireBase):
     assigned_doctor: Optional[DoctorOut] = None
-    assigned_room: Optional[RoomOut] = None
+    assigned_room: Optional[int] = None
 
     model_config = {"from_attributes": True}
 

@@ -19,10 +19,8 @@ class Patient(Base):
     contact_info = Column(String)
 
     doctor_id = Column(Integer, ForeignKey("doctors.id"))
-    room_id = Column(Integer, ForeignKey("rooms.id"))
 
     doctor = relationship("Doctor", back_populates="patients")
-    room = relationship("Room", back_populates="patients")
     disease_history = relationship(
         "DiseaseHistory", back_populates="patient", cascade="all, delete-orphan"
     )

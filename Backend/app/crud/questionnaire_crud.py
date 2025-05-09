@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from typing import Dict
 from app.models.questionnaire import Questionnaire
 from app.schemas.questionnaire_schema import QuestionnaireCreate
-from ..models import Doctor, Room
+from ..models import Doctor
 
 
 # 1. Configure Gemini API

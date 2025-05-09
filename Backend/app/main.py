@@ -6,7 +6,6 @@ from app.routes import (
     patient_routes,
     doctor_route,
     questionnaire_route,
-    room_route,
     login_route,
 )
 from .crud.auth_crud import fingerprint_loop
@@ -39,7 +38,6 @@ except Exception as e:
 app.include_router(patient_routes.router)
 app.include_router(doctor_route.router)
 app.include_router(questionnaire_route.router)
-app.include_router(room_route.router)
 app.include_router(login_route.router)
 
 

@@ -6,6 +6,7 @@ import serial
 import adafruit_fingerprint
 from app.schemas.patient_schema import PatientCreate, PatientOut
 from app.models.patient import Patient
+from fastapi.responses import JSONResponse
 
 
 # uart = serial.Serial("/dev/ttyAMA0", baudrate=57600, timeout=1)
@@ -34,8 +35,8 @@ def get_fingerprint() -> int | None:
 
 
 def fingerprint_loop(callback):
-
     global is_logged_in, stop_scanning
+
     while True:
         if stop_scanning or is_logged_in:
             time.sleep(1)
@@ -106,7 +107,7 @@ def enroll_finger(location: int) -> bool:
     return True
 
 
-def enroll_new_user(db: Session):
+def enroll_new_user():
     location = get_next_free_id()
 
     success = enroll_finger(location)
@@ -117,3 +118,40 @@ def enroll_new_user(db: Session):
         "message": f"Fingerprint enrolled and saved",
         "fingerprint_id": location,
     }
+
+
+def patient_logout():
+    global is_logged_in, stop_scanning
+
+    is_logged_in = False
+    stop_scanning = False
+    return {"message": "Logged out. Fingerprint scanner re-enabled."}
+
+
+def patient_login(db: Session):
+    global is_logged_in, stop_scanning
+
+    matched_id = get_fingerprint()
+
+    if matched_id is None:
+        raise HTTPException(status_code=401, detail="Fingerprint not recognized")
+
+    user = db.query(Patient).filter(Patient.fingerprint_id == matched_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    is_logged_in = True
+    stop_scanning = True
+
+    return JSONResponse(
+        status_code=200,
+        content={
+            "status": "success",
+            "message": f"Welcome {user.name}",
+            "user": {
+                "id": user.id,
+                "name": user.name,
+            },
+            "confidence": finger.confidence,
+        },
+    )

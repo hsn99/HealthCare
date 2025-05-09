@@ -22,8 +22,8 @@ const Nav = ({ user, handleLogOut }) => {
           </>
         ) : (
           <div className="navbar-right">
-            <Link to="/patient" className="navButton">
-              <span>Add new Patient</span>
+            <Link to="/admin-panel" className="navButton">
+              <span>Admin Panel</span>
             </Link>
           </div>
         )}

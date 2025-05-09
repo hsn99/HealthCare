@@ -1,6 +1,5 @@
 from typing import Optional
 from pydantic import BaseModel, ConfigDict
-from .room_schema import RoomOut
 
 
 class DoctorBase(BaseModel):
@@ -9,12 +8,11 @@ class DoctorBase(BaseModel):
 
 
 class DoctorCreate(DoctorBase):
-    pass
+    room_id: int
 
 
 class DoctorOut(DoctorBase):
     id: int
-    room_id: Optional[int]
-    room: Optional[RoomOut] = None
+    room_id: int
 
     model_config = ConfigDict(from_attributes=True)

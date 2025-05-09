@@ -5,6 +5,8 @@ import Home from "./components/HomePage/homepage"
 import Nav from "./components/Nav/Nav"
 import QuestionsForm from "./components/QuestionsForm/QuestionsForm"
 import PatientForm from "./components/PatientForm/patientForm"
+import DoctorForm from "./components/DoctorForm/doctorForm"
+import AdminPanel from "./components/AdminPanel/adminPanel"
 
 function App() {
   const [user, setUser] = useState(null)
@@ -34,6 +36,8 @@ function App() {
             <Route path="/" element={<Home setUser={setUser} />} />
             <Route path="/test" element={<QuestionsForm />} />
             <Route path="/patient" element={<PatientForm />} />
+            <Route path="/doctor" element={<DoctorForm />} />
+            <Route path="/admin-panel" element={<AdminPanel />} />
           </Routes>
         </main>
       </div>

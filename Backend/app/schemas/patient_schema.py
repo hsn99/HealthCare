@@ -1,8 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
-
 from app.schemas.doctor_schema import DoctorOut
-from app.schemas.room_schema import RoomOut
 from app.schemas.history_schema import DiseaseHistoryOut
 
 
@@ -24,7 +22,7 @@ class PatientCreate(PatientBase):
 class PatientOut(PatientBase):
     id: int
     doctor: Optional[DoctorOut]
-    room: Optional[RoomOut]
+    room: Optional[int]
     disease_history: List[DiseaseHistoryOut] = []
     fingerprint_id: Optional[int] = None
 
