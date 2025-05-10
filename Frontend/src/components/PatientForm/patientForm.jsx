@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import axios from "axios"
-import "./PatientForm.css" // Import the CSS file
+import "./PatientForm.css"
 
 const PatientForm = () => {
   const [form, setForm] = useState({
@@ -17,6 +17,7 @@ const PatientForm = () => {
   const [scanError, setScanError] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
   const [submitError, setSubmitError] = useState("")
+  const [scanStage, setScanStage] = useState("") // New state for animation stages
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -27,13 +28,21 @@ const PatientForm = () => {
     setIsScanning(true)
     setScanError("")
     setSuccessMessage("")
+    setScanStage("📍 Place your finger on the scanner...")
 
     try {
+      await new Promise((resolve) => setTimeout(resolve, 3000))
+      setScanStage("✋ Remove and place your finger again...")
+
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+
       const res = await axios.post("http://localhost:8000/patients/enroll")
       setFingerprintId(res.data.fingerprint_id)
+      setScanStage("✅ Fingerprint added successfully!")
     } catch (err) {
       console.error(err)
       setScanError("❌ Fingerprint scanning failed.")
+      setScanStage("")
     } finally {
       setIsScanning(false)
     }
@@ -43,6 +52,7 @@ const PatientForm = () => {
     e.preventDefault()
     setSubmitError("")
     setSuccessMessage("")
+    setScanStage("")
 
     try {
       const payload = {
@@ -67,6 +77,7 @@ const PatientForm = () => {
           contact_info: "",
         })
         setFingerprintId(null)
+        setScanStage("")
       }, 2000)
     } catch (err) {
       console.error(err)
@@ -74,8 +85,7 @@ const PatientForm = () => {
     }
   }
 
-  const isFormValid =
-    form.name && form.age && form.gender && fingerprintId
+  const isFormValid = form.name && form.age && form.gender && fingerprintId
 
   return (
     <div className="form-container">
@@ -142,9 +152,7 @@ const PatientForm = () => {
             <button
               type="button"
               onClick={handleScanFingerprint}
-              disabled={
-                isScanning || !(form.name && form.age && form.gender)
-              }
+              disabled={isScanning || !(form.name && form.age && form.gender)}
               className={`scan-btn ${
                 isScanning || !(form.name && form.age && form.gender)
                   ? "btn-disabled"
@@ -154,14 +162,16 @@ const PatientForm = () => {
               {isScanning ? "Scanning..." : "🔍 Scan Fingerprint"}
             </button>
 
-            {fingerprintId && (
+            {scanStage && (
+              <div className="scan-stage-animation">{scanStage}</div>
+            )}
+
+            {/* {fingerprintId && (
               <span className="success-text">
                 ✅ Scanned: ID {fingerprintId}
               </span>
-            )}
-            {scanError && (
-              <span className="error-text">{scanError}</span>
-            )}
+            )} */}
+            {scanError && <span className="error-text">{scanError}</span>}
           </div>
 
           <button

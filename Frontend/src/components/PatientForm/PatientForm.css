@@ -102,3 +102,22 @@
 .text-center {
   text-align: center;
 }
+
+.scan-stage-animation {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: #007bff;
+  /* animation: pulse 1.2s infinite; */
+}
+
+/* @keyframes pulse {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.3;
+  }
+} */

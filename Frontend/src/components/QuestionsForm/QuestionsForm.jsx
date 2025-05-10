@@ -50,7 +50,7 @@ const abcdeQuestions = [
   },
 ]
 
-function QuestionsForm() {
+function QuestionsForm({ handleLogOut }) {
   const [started, setStarted] = useState(false)
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState([])
@@ -72,19 +72,22 @@ function QuestionsForm() {
   const patient_id = localStorage.getItem("user_id")
 
   const handleNext = () => {
-    let answerToSave = "No data provided"
+    let newAnswers = []
 
-    if (abcdeQuestions[currentQuestion].section === "Circulation") {
-      answerToSave = `${bloodPressure || "No BP"}/${
-        measurementResult || "No Pulse"
-      }`
-    } else if (abcdeQuestions[currentQuestion].section === "Exposure") {
-      answerToSave = measurementResult || "No Temperature"
+    const section = abcdeQuestions[currentQuestion].section
+
+    if (section === "Circulation") {
+      const bp = bloodPressure || "No BP"
+      const pulse = measurementResult || "No Pulse"
+      newAnswers.push(bp, pulse)
+    } else if (section === "Exposure") {
+      newAnswers.push(measurementResult || "No Temperature")
     } else {
-      answerToSave = input || "No answer"
+      newAnswers.push(input || "No answer")
     }
 
-    const updatedAnswers = [...answers, answerToSave]
+    const updatedAnswers = [...answers, ...newAnswers]
+
     setAnswers(updatedAnswers)
     setInput("")
     setMeasurementResult("")
@@ -101,6 +104,7 @@ function QuestionsForm() {
         .then((res) => {
           setResponseData(res.data)
           setStarted(false)
+          handleLogOut()
         })
         .catch((err) => {
           alert("Error submitting answers")

@@ -11,7 +11,7 @@ from app.models.questionnaire import Questionnaire
 from app.models.patient import Patient
 from app.schemas.questionnaire_schema import QuestionnaireCreate
 from ..models import Doctor
-
+from ..sensors import heartrate_monitor
 
 # 1. Configure Gemini API
 genai.configure(
@@ -80,24 +80,25 @@ def Geamini(message):
 
 def analyse_questions(db: Session, data: Dict):
     answers = data.get("answers", [])
-
     patient = db.query(Patient).filter(Patient.id == data["patient_id"]).first()
-
+    print(answers)
     patient_data = {
         "id": patient.id,
         "age": patient.age,
-        "temperature": answers[2],  # From MLX90640
+        "temperature": answers[5],  # From MLX90640
         "weight": patient.weight,  # From HX711
         "spo2": 70,  # From MAX30102
         "heart_rate": 116,  # From MAX30102
-        "blood_pressure": data["measurement"],  # From manual or sensor
+        "blood_pressure": answers[2],  # From manual or sensor
         # ABCDE Questions (answers from touchscreen input)
         "questions": {
             "A_airway_difficulty_breathing_swallowing": answers[0],
             "B_shortness_of_breath": answers[1],
-            "D_confused_or_numbness": answers[3],
+            "D_confused_or_numbness": answers[4],
         },
     }
+
+    print(patient_data)
 
     prompt = build_gemini_prompt(patient_data)
     response = Geamini(prompt)
@@ -129,10 +130,10 @@ def analyse_questions(db: Session, data: Dict):
 
 
 def circulation_test():
-    systolic = 120
-    diastolic = 80
-    status = "Normal"
-    return {"res": systolic}
+    hrm = heartrate_monitor.HeartRateMonitor()
+    hrm.start_sensor()
+
+    return {"res": {hrm.bpm, hrm.spo2}}
 
 
 def get_max_thermal_temperature(duration_seconds=5):
@@ -163,6 +164,6 @@ def get_max_thermal_temperature(duration_seconds=5):
 
 
 def exposure_test():
-    thermal_data = get_max_thermal_temperature()
-    print(thermal_data)
-    return {"res": thermal_data["max_temperature"]}
+    # thermal_data = get_max_thermal_temperature()
+    # print(thermal_data)
+    return {"res": 37}

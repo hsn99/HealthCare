@@ -44,7 +44,10 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<Home setUser={setUser} />} />
-            <Route path="/test" element={<QuestionsForm />} />
+            <Route
+              path="/test"
+              element={<QuestionsForm handleLogOut={handleLogOut} />}
+            />
             <Route path="/patient" element={<PatientForm />} />
             <Route path="/doctor" element={<DoctorForm />} />
             <Route path="/admin-panel" element={<AdminPanel />} />
