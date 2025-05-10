@@ -13,7 +13,7 @@ from app.schemas.questionnaire_schema import QuestionnaireCreate, QuestionnaireO
 router = APIRouter(prefix="/questionnaire", tags=["Questionnaire"])
 
 
-@router.post("/", response_model=QuestionnaireOut)
+@router.post("/")
 def create(data: Dict, db: Session = Depends(get_db)):
     return analyse_questions(db, data)
 

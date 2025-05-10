@@ -2,6 +2,7 @@ import time
 import board
 import busio
 import numpy as np
+import random
 import adafruit_mlx90640
 import google.generativeai as genai
 from fastapi import HTTPException
@@ -52,7 +53,6 @@ def build_gemini_prompt(data):
     prompt = (
         "Based on this patient information and answers to ABCDE triage questions, respond with ONLY one color "
         "from this list:\n"
-        "- Blue (Resuscitation)\n"
         "- Red (Emergency)\n"
         "- Yellow (Urgent)\n"
         "- Green (Semi-urgent)\n"
@@ -90,7 +90,6 @@ def analyse_questions(db: Session, data: Dict):
         "spo2": 70,  # From MAX30102
         "heart_rate": 116,  # From MAX30102
         "blood_pressure": answers[2],  # From manual or sensor
-        # ABCDE Questions (answers from touchscreen input)
         "questions": {
             "A_airway_difficulty_breathing_swallowing": answers[0],
             "B_shortness_of_breath": answers[1],
@@ -103,37 +102,35 @@ def analyse_questions(db: Session, data: Dict):
     prompt = build_gemini_prompt(patient_data)
     response = Geamini(prompt)
     print(response)
-    # condition = ""
-    # if "yes" in answers[:2]:
-    #     condition = "emergency"
-    # elif len(answers) > 2 and ("BP" in answers[2] or "Pulse" in answers[2]):
-    #     condition = "cardiology"
-    # elif len(answers) > 4 and "Temperature" in answers[4]:
-    #     condition = "infection"
-    # else:
-    #     condition = "general"
 
-    # doctor = db.query(Doctor).filter(Doctor.specialization == condition).first()
+    if response == "Red":
+        waiting_time = "15 minutes"
+    elif response == "Yellow":
+        waiting_time = "30 minutes"
+    elif response == "Green":
+        waiting_time = "45 minutes"
+    elif response == "White":
+        waiting_time = "Aound 1.5 hours"
 
-    # if not doctor:
-    #     raise HTTPException(status_code=404, detail="No doctor found for condition")
+    doctor_list = db.query(Doctor).all()
+    print(doctor_list)
 
-    # room = db.query(Room).filter(Room.id == doctor.room_id).first()
+    if not doctor_list:
+        raise HTTPException(status_code=404, detail="No doctor found for condition")
 
-    # return {
-    #     "assigned_doctor": doctor.name,
-    #     "assigned_room": room.room_number if room else None,
-    #     "waiting_time": room.waiting_time if room else None,
-    # }
-
-    return {"response": response, "assigned_doctor": None, "assigned_room": None}
+    assigned_doctor = random.choice(doctor_list)
+    return {
+        "assigned_doctor": assigned_doctor.name,
+        "assigned_room": assigned_doctor.room_id if assigned_doctor else None,
+        "waiting_time": waiting_time,
+    }
 
 
 def circulation_test():
     hrm = heartrate_monitor.HeartRateMonitor()
     hrm.start_sensor()
 
-    return {"res": {hrm.bpm, hrm.spo2}}
+    return {"res": hrm}
 
 
 def get_max_thermal_temperature(duration_seconds=5):
@@ -164,6 +161,6 @@ def get_max_thermal_temperature(duration_seconds=5):
 
 
 def exposure_test():
-    # thermal_data = get_max_thermal_temperature()
-    # print(thermal_data)
-    return {"res": 37}
+    thermal_data = get_max_thermal_temperature()
+    print(thermal_data)
+    return {"res": thermal_data["max_temperature"]}

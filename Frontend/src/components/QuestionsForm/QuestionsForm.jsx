@@ -104,7 +104,9 @@ function QuestionsForm({ handleLogOut }) {
         .then((res) => {
           setResponseData(res.data)
           setStarted(false)
-          handleLogOut()
+          setTimeout(() => {
+            handleLogOut()
+          }, 7000)
         })
         .catch((err) => {
           alert("Error submitting answers")
@@ -147,9 +149,9 @@ function QuestionsForm({ handleLogOut }) {
             <strong>Assigned Room:</strong>{" "}
             {responseData.assigned_room || "Not Assigned"}
           </p>
-          <button className="button" onClick={handleStart}>
+          {/* <button className="button" onClick={handleStart}>
             Restart Test
-          </button>
+          </button> */}
         </div>
       ) : !started ? (
         <div className="card center">
@@ -193,17 +195,20 @@ function QuestionsForm({ handleLogOut }) {
               </p>
             </>
           ) : (
-            <select
-              className="dropdown"
-              onChange={(e) => setInput(e.target.value)}
-              value={input}
-            >
-              <option value="" disabled>
-                Select your answer
-              </option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
+            <div className="yes-no-buttons">
+              <button
+                className={`button small ${input === "yes" ? "selected" : ""}`}
+                onClick={() => setInput("yes")}
+              >
+                Yes
+              </button>
+              <button
+                className={`button small ${input === "no" ? "selected" : ""}`}
+                onClick={() => setInput("no")}
+              >
+                No
+              </button>
+            </div>
           )}
 
           <button

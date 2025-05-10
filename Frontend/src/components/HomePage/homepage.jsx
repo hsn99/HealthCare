@@ -30,7 +30,7 @@ const Home = ({ setUser }) => {
       } finally {
         setChecking(false)
       }
-    }, 6000)
+    }, 3000)
 
     return () => clearInterval(interval)
   }, [navigate, setUser])

@@ -108,3 +108,15 @@
   font-style: italic;
   color: #333;
 }
+
+.yes-no-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 15px;
+}
+
+.button.small.selected {
+  background-color: #007bff;
+  color: white;
+}
