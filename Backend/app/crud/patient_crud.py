@@ -37,3 +37,9 @@ def update_patient(db: Session, patient_id: int, patient_data: PatientCreate):
     db.commit()
     db.refresh(doctor)
     return doctor
+
+
+def get_patient_weight():
+    return {
+        "weight": 70,
+    }

@@ -1,13 +1,11 @@
-.form-container {
-  min-height: 110vh;
+/* .doctor-form-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f3f4f6;
   padding: 2rem;
 }
 
-.form-box {
+.doctor-form-box {
   width: 100%;
   max-width: 48rem;
   background-color: #ffffff;
@@ -101,4 +99,4 @@
 
 .text-center {
   text-align: center;
-}
+} */

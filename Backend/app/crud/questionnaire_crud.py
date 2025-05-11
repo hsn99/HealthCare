@@ -12,7 +12,9 @@ from app.models.questionnaire import Questionnaire
 from app.models.patient import Patient
 from app.schemas.questionnaire_schema import QuestionnaireCreate
 from ..models import Doctor
-from ..sensors import heartrate_monitor
+from ..sensors import heartrate_monitor, max30102
+from ..sensors.max30102 import MAX30102
+from ..sensors.heartrate_monitor import HeartRateMonitor
 
 # 1. Configure Gemini API
 genai.configure(
@@ -62,13 +64,12 @@ def build_gemini_prompt(data):
         f"Age: {data['age']}\n"
         f"Temperature: {data['temperature']} Â°C\n"
         f"Weight: {data['weight']} kg\n"
-        f"SpO2: {data['spo2']} %\n"
-        f"Heart Rate: {data['heart_rate']} bpm\n"
+        f"Heart Rate: {data['spo2']} bpm\n"
         f"Blood Pressure: {data['blood_pressure']}\n\n"
         "ABCDE Triage Questions:\n"
-        f"A - Difficulty breathing or swallowing: {'Yes' if data['questions']['A_airway_difficulty_breathing_swallowing'] else 'No'}\n"
-        f"B - Shortness of breath: {'Yes' if data['questions']['B_shortness_of_breath'] else 'No'}\n"
-        f"D - Confusion or numbness: {'Yes' if data['questions']['D_confused_or_numbness'] else 'No'}\n"
+        f"A - Difficulty breathing or swallowing: {data['questions']['A_airway_difficulty_breathing_swallowing']}\n"
+        f"B - Shortness of breath: {data['questions']['B_shortness_of_breath']}\n"
+        f"D - Confusion or numbness: {data['questions']['D_confused_or_numbness']}\n"
     )
     return prompt
 
@@ -87,8 +88,7 @@ def analyse_questions(db: Session, data: Dict):
         "age": patient.age,
         "temperature": answers[5],  # From MLX90640
         "weight": patient.weight,  # From HX711
-        "spo2": 70,  # From MAX30102
-        "heart_rate": 116,  # From MAX30102
+        "spo2": answers[3],  # From MAX30102
         "blood_pressure": answers[2],  # From manual or sensor
         "questions": {
             "A_airway_difficulty_breathing_swallowing": answers[0],
@@ -127,10 +127,18 @@ def analyse_questions(db: Session, data: Dict):
 
 
 def circulation_test():
-    hrm = heartrate_monitor.HeartRateMonitor()
+    hrm = HeartRateMonitor()
     hrm.start_sensor()
 
-    return {"res": hrm}
+    try:
+        time.sleep(10)
+    except KeyboardInterrupt:
+        print("Keyboard interrupt detected, exiting...")
+
+    hrm.stop_sensor()
+
+    heart_rate = hrm.spo2
+    return {"res": heart_rate}
 
 
 def get_max_thermal_temperature(duration_seconds=5):

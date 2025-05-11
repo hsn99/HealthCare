@@ -1,6 +1,13 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import axios from "axios"
 import "./QuestionsForm.css"
+import welcomeAudio from "../../assets/audio/Welcome.wav"
+import airwayAudio from "../../assets/audio/A.wav"
+import breathingAudio from "../../assets/audio/B.wav"
+import circulationAudio from "../../assets/audio/C.wav"
+import disabilityAudio from "../../assets/audio/D.wav"
+import exposureAudio from "../../assets/audio/E.wav"
+import finalAudio from "../../assets/audio/Final.wav"
 
 const abcdeQuestions = [
   {
@@ -59,6 +66,38 @@ function QuestionsForm({ handleLogOut }) {
   const [measurementResult, setMeasurementResult] = useState("")
   const [bloodPressure, setBloodPressure] = useState("")
 
+  const final = new Audio(finalAudio)
+
+  useEffect(() => {
+    if (!started) return
+
+    let section = abcdeQuestions[currentQuestion].section
+    let audioPath
+
+    switch (section) {
+      case "Airway":
+        audioPath = airwayAudio
+        break
+      case "Breathing":
+        audioPath = breathingAudio
+        break
+      case "Circulation":
+        audioPath = circulationAudio
+        break
+      case "Disability":
+        audioPath = disabilityAudio
+        break
+      case "Exposure":
+        audioPath = exposureAudio
+        break
+      default:
+        return
+    }
+
+    const audio = new Audio(audioPath)
+    audio.play()
+  }, [currentQuestion, started])
+
   const handleStart = () => {
     setStarted(true)
     setCurrentQuestion(0)
@@ -104,6 +143,8 @@ function QuestionsForm({ handleLogOut }) {
         .then((res) => {
           setResponseData(res.data)
           setStarted(false)
+          final.play()
+
           setTimeout(() => {
             handleLogOut()
           }, 7000)
@@ -114,6 +155,11 @@ function QuestionsForm({ handleLogOut }) {
         })
     }
   }
+
+  useEffect(() => {
+    const audio = new Audio(welcomeAudio)
+    audio.play()
+  }, [])
 
   const handleMeasurement = async (section) => {
     try {
@@ -197,13 +243,17 @@ function QuestionsForm({ handleLogOut }) {
           ) : (
             <div className="yes-no-buttons">
               <button
-                className={`button small ${input === "yes" ? "selected" : ""}`}
+                className={`button small yes ${
+                  input === "yes" ? "selected yes" : ""
+                }`}
                 onClick={() => setInput("yes")}
               >
                 Yes
               </button>
               <button
-                className={`button small ${input === "no" ? "selected" : ""}`}
+                className={`button small no ${
+                  input === "no" ? "selected no" : ""
+                }`}
                 onClick={() => setInput("no")}
               >
                 No

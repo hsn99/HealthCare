@@ -7,7 +7,6 @@ const PatientForm = () => {
     name: "",
     age: "",
     gender: "",
-    weight: "",
     height: "",
     contact_info: "",
   })
@@ -17,7 +16,27 @@ const PatientForm = () => {
   const [scanError, setScanError] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
   const [submitError, setSubmitError] = useState("")
-  const [scanStage, setScanStage] = useState("") // New state for animation stages
+  const [scanStage, setScanStage] = useState("")
+
+  const [weightResult, setWeightResult] = useState(null)
+  const [weightError, setWeightError] = useState("")
+  const [isWeightMeasuring, setIsWeightMeasuring] = useState(false)
+
+  const handleMeasureWeight = async () => {
+    setIsWeightMeasuring(true)
+    setWeightError("")
+    setWeightResult(null)
+
+    try {
+      const res = await axios.post("http://localhost:8000/patients/weight")
+      setWeightResult(res.data.weight)
+    } catch (err) {
+      console.error(err)
+      setWeightError("❌ Failed to measure weight.")
+    } finally {
+      setIsWeightMeasuring(false)
+    }
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -59,7 +78,7 @@ const PatientForm = () => {
         ...form,
         fingerprint_id: fingerprintId,
         age: Number(form.age) || 0,
-        weight: parseFloat(form.weight) || 0,
+        weight: weightResult || 0,
         height: Number(form.height) || 0,
       }
 
@@ -72,12 +91,12 @@ const PatientForm = () => {
           name: "",
           age: "",
           gender: "",
-          weight: "",
           height: "",
           contact_info: "",
         })
         setFingerprintId(null)
         setScanStage("")
+        setWeightResult(null)
       }, 2000)
     } catch (err) {
       console.error(err)
@@ -88,7 +107,7 @@ const PatientForm = () => {
   const isFormValid = form.name && form.age && form.gender && fingerprintId
 
   return (
-    <div className="form-container">
+    <div className="patient-form-container">
       <div className="form-box">
         <h2 className="form-title">🩺 Add New Patient</h2>
 
@@ -122,15 +141,31 @@ const PatientForm = () => {
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
-            <input
-              type="number"
-              step="0.01"
-              name="weight"
-              placeholder="Weight (kg)"
-              value={form.weight}
-              onChange={handleChange}
-              className="input-style"
-            />
+
+            <div className="weight-section">
+              <button
+                type="button"
+                onClick={handleMeasureWeight}
+                disabled={isWeightMeasuring}
+                className={`measure-btn ${
+                  isWeightMeasuring ? "btn-disabled" : ""
+                }`}
+              >
+                {isWeightMeasuring
+                  ? "Measuring Weight..."
+                  : "🔍 Measure Weight"}
+              </button>
+
+              {weightResult && (
+                <div className="weight-result">
+                  <strong>Weight: </strong>
+                  {weightResult} kg
+                </div>
+              )}
+
+              {weightError && <span className="error-text">{weightError}</span>}
+            </div>
+
             <input
               type="number"
               name="height"
@@ -165,12 +200,6 @@ const PatientForm = () => {
             {scanStage && (
               <div className="scan-stage-animation">{scanStage}</div>
             )}
-
-            {/* {fingerprintId && (
-              <span className="success-text">
-                ✅ Scanned: ID {fingerprintId}
-              </span>
-            )} */}
             {scanError && <span className="error-text">{scanError}</span>}
           </div>
 

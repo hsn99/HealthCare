@@ -1,6 +1,6 @@
 # heartrate_monitor.py
-from max30102 import MAX30102
-import hrcalc
+from app.sensors.max30102 import MAX30102
+from app.sensors import hrcalc
 import threading
 import time
 import numpy as np
@@ -47,7 +47,7 @@ class HeartRateMonitor(object):
                     red_data.pop(0)
 
                 if len(ir_data) == 100:
-                    bpm, valid_bpm, spo2, valid_spo2 = hrcalc.calc_hr_and_spo2(
+                    bpm, valid_bpm, self.spo2, valid_spo2 = hrcalc.calc_hr_and_spo2(
                         ir_data, red_data
                     )
                     if valid_bpm:
@@ -60,7 +60,7 @@ class HeartRateMonitor(object):
                             if self.print_result:
                                 print("Finger not detected")
                         if self.print_result:
-                            print("BPM: {0}, SpO2: {1}".format(self.bpm, spo2))
+                            print("BPM: {0}, SpO2: {1}".format(self.bpm, self.spo2))
 
             time.sleep(self.LOOP_TIME)
 
@@ -73,6 +73,6 @@ class HeartRateMonitor(object):
 
     def stop_sensor(self, timeout=2.0):
         self._thread.stopped = True
-        self.bpm = 0
+        # self.bpm = 0
         self._thread.join(timeout)
         return self.bpm, self.spo2

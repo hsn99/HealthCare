@@ -12,6 +12,10 @@ const AdminPanel = () => {
     navigate("/patient")
   }
 
+  const goToAllAddPatient = () => {
+    navigate("/patients/all")
+  }
+
   return (
     <div className="form-container">
       <div className="form-box text-center">
@@ -22,6 +26,9 @@ const AdminPanel = () => {
           </button>
           <button className="submit-btn" onClick={goToAddPatient}>
             Add Patient
+          </button>
+          <button className="submit-btn" onClick={goToAllAddPatient}>
+            All Patients
           </button>
         </div>
       </div>

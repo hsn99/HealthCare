@@ -37,7 +37,7 @@ const Home = ({ setUser }) => {
 
   return (
     <div className="homepage-container">
-      <img src={logo} alt="ON POWER Logo" className="logo" />
+      <img src={logo} alt="ON POWER Logo" className="logo-body" />
       <div className="card">
         {!localUser ? (
           <>
