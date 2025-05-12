@@ -8,6 +8,8 @@ import circulationAudio from "../../assets/audio/C.wav"
 import disabilityAudio from "../../assets/audio/D.wav"
 import exposureAudio from "../../assets/audio/E.wav"
 import finalAudio from "../../assets/audio/Final.wav"
+import circulationImage from "../../assets/Spo2.png"
+import exposureImage from "../../assets/ThermalCam.png"
 
 const abcdeQuestions = [
   {
@@ -147,7 +149,7 @@ function QuestionsForm({ handleLogOut }) {
 
           setTimeout(() => {
             handleLogOut()
-          }, 7000)
+          }, 10000)
         })
         .catch((err) => {
           alert("Error submitting answers")
@@ -168,8 +170,8 @@ function QuestionsForm({ handleLogOut }) {
       )
 
       if (response?.data) {
-        setMeasurementResult(response.data.res)
-        setInput(response.data.res) // Used to enable the "Next" button
+        setMeasurementResult(Number(response.data.res.toFixed(2)))
+        setInput(Number(response.data.res.toFixed(2)))
       } else {
         alert("No data received from the server.")
       }
@@ -187,6 +189,23 @@ function QuestionsForm({ handleLogOut }) {
       {responseData ? (
         <div className="card response">
           <h2>Test Completed</h2>
+          {responseData.color && (
+            <div
+              className="status-badge"
+              style={{
+                backgroundColor: responseData.color,
+                color: "#fff",
+                padding: "8px 12px",
+                borderRadius: "8px",
+                fontWeight: "bold",
+                textTransform: "capitalize",
+                display: "inline-block",
+                marginBottom: "10px",
+              }}
+            >
+              Condition: {responseData.color}
+            </div>
+          )}
           <p>
             <strong>Assigned Doctor:</strong>{" "}
             {responseData.assigned_doctor || "Not Assigned"}
@@ -195,9 +214,24 @@ function QuestionsForm({ handleLogOut }) {
             <strong>Assigned Room:</strong>{" "}
             {responseData.assigned_room || "Not Assigned"}
           </p>
-          {/* <button className="button" onClick={handleStart}>
-            Restart Test
-          </button> */}
+          <p>
+            <strong>Waiting Time:</strong>{" "}
+            {responseData.waiting_time || "Not Assigned"}
+          </p>
+          <div className="color-legend">
+            <p>
+              <span className="dot red" /> Emergency
+            </p>
+            <p>
+              <span className="dot yellow" /> Urgent
+            </p>
+            <p>
+              <span className="dot green" /> Semi-urgent
+            </p>
+            <p>
+              <span className="dot white" /> Non-urgent
+            </p>
+          </div>
         </div>
       ) : !started ? (
         <div className="card center">
@@ -214,7 +248,7 @@ function QuestionsForm({ handleLogOut }) {
 
           {current.section === "Circulation" ||
           current.section === "Exposure" ? (
-            <>
+            <div className="test-controls">
               {current.section === "Circulation" && (
                 <div className="input-group">
                   <label htmlFor="blood_pressure" className="input-label">
@@ -230,16 +264,29 @@ function QuestionsForm({ handleLogOut }) {
                   />
                 </div>
               )}
-              <button
-                className="button small"
-                onClick={() => handleMeasurement(current.section)}
-              >
-                Start {current.section} Test
-              </button>
-              <p className="test-result-label">
-                {measurementResult || "Result will appear here"}
-              </p>
-            </>
+              <div className="test-section-flex">
+                <button
+                  className="button small"
+                  onClick={() => handleMeasurement(current.section)}
+                >
+                  Start {current.section} Test
+                </button>
+                <p className="test-result-label">
+                  {measurementResult || "Result will appear here"}
+                </p>
+                <div className="instruction-image-container">
+                  <img
+                    src={
+                      current.section === "Circulation"
+                        ? circulationImage
+                        : exposureImage
+                    }
+                    alt={`${current.section} test instructions`}
+                    className="instruction-image"
+                  />
+                </div>
+              </div>
+            </div>
           ) : (
             <div className="yes-no-buttons">
               <button

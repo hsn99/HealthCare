@@ -123,6 +123,7 @@ def analyse_questions(db: Session, data: Dict):
         "assigned_doctor": assigned_doctor.name,
         "assigned_room": assigned_doctor.room_id if assigned_doctor else None,
         "waiting_time": waiting_time,
+        "color": response,
     }
 
 
@@ -141,10 +142,12 @@ def circulation_test():
     return {"res": heart_rate}
 
 
+i2c = busio.I2C(board.SCL, board.SDA)
+mlx = adafruit_mlx90640.MLX90640(i2c)
+mlx.refresh_rate = adafruit_mlx90640.RefreshRate.REFRESH_1_HZ
+
+
 def get_max_thermal_temperature(duration_seconds=5):
-    i2c = busio.I2C(board.SCL, board.SDA)
-    mlx = adafruit_mlx90640.MLX90640(i2c)
-    mlx.refresh_rate = adafruit_mlx90640.RefreshRate.REFRESH_1_HZ
 
     frame = np.zeros((24 * 32,))  # Array for 768 temperature readings
     end_time = time.time() + duration_seconds

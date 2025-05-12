@@ -1,17 +1,22 @@
 // homepage.jsx
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import "./homepage.css"
 import logo from "./logo.png"
+import fingerPrint from "../../assets/Finger.png"
 
 const Home = ({ setUser }) => {
   const [checking, setChecking] = useState(false)
   const [localUser, setLocalUser] = useState(null)
   const navigate = useNavigate()
+  const isRequesting = useRef(false)
 
   useEffect(() => {
     const interval = setInterval(async () => {
+      if (isRequesting.current) return //
+
+      isRequesting.current = true
       setChecking(true)
       try {
         const response = await axios.post(
@@ -28,6 +33,7 @@ const Home = ({ setUser }) => {
       } catch (err) {
         console.error("Error checking fingerprint:", err)
       } finally {
+        isRequesting.current = false
         setChecking(false)
       }
     }, 3000)
@@ -43,8 +49,14 @@ const Home = ({ setUser }) => {
           <>
             <h2 className="title">Welcome to the Health Assistant</h2>
             <p className="subtitle">Please scan your fingerprint to begin</p>
-            <div className={`fingerprint ${checking ? "scanning" : ""}`}></div>
-            {checking && <p className="status-text">Checking...</p>}
+            {/* <div className={`fingerprint ${checking ? "scanning" : ""}`}></div> */}
+            {checking && (
+              <img
+                src={fingerPrint}
+                alt="Fingerprint scanning animation"
+                className="fingerprint-image"
+              />
+            )}
           </>
         ) : (
           <>

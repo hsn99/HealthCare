@@ -136,3 +136,40 @@
   gap: 30px;
   margin-bottom: 15px;
 }
+
+.instruction-image-container {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.instruction-image {
+  max-width: 25%;
+  height: auto;
+  border-radius: 12px;
+}
+
+/* NEW ADDITIONS FOR RTL SUPPORT BASED ON LANG ATTRIBUTE */
+.question-card[lang="ar"] {
+  direction: rtl;
+  text-align: right;
+}
+
+.dot {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+.red {
+  background-color: red;
+}
+.yellow {
+  background-color: gold;
+}
+.green {
+  background-color: green;
+}
+.white {
+  background-color: white;
+}
